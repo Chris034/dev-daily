@@ -1,0 +1,20 @@
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["apps/web/dist/**", "apps/api/dist/**"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": []
+    },
+    "dev": {
+      "dependsOn": ["build"],
+      "outputs": []
+    }
+  },
+  "globalDependencies": ["apps/web", "apps/api"]
+}
