@@ -1,6 +1,6 @@
 import type { Lesson, Topic } from '../types';
 
-export const TOPICS: Topic[] = ['JavaScript', 'TypeScript', 'React', 'Node.js', 'CSS'];
+export const TOPICS: Topic[] = ['JavaScript', 'TypeScript', 'React', 'Node.js', 'CSS', 'System Design', 'AI'];
 
 export const LESSONS: Lesson[] = [
   {
@@ -122,6 +122,86 @@ export const LESSONS: Lesson[] = [
     options: [{ id: 'a', label: 'When tasks are independent and all must succeed' }, { id: 'b', label: 'When each task needs the previous result' }, { id: 'c', label: 'When failures should always be ignored' }],
     answer: 'a',
     takeaway: 'Model the actual dependency graph instead of serializing every await.',
+  },
+  {
+    id: 'system-design-caching',
+    topic: 'System Design',
+    title: 'Choose the right cache boundary',
+    summary: 'Reduce latency without introducing stale data in the wrong layer.',
+    duration: 9,
+    difficulty: 2,
+    concept: 'A cache is a deliberate trade between freshness, speed, complexity, and failure behavior.',
+    explanation: [
+      'Start by identifying the expensive operation and the freshness users actually require. Cache as close to that operation as practical.',
+      'Every cache needs an invalidation strategy, a bounded lifetime, and defined behavior when the cache is unavailable. Without those, it becomes a hidden source of correctness bugs.',
+    ],
+    code: `async function getProduct(id: string) {\n  const cached = await cache.get(\`product:\${id}\`);\n  if (cached) return cached;\n\n  const product = await database.products.find(id);\n  await cache.set(\`product:\${id}\`, product, { ttl: 60 });\n  return product;\n}`,
+    language: 'TypeScript',
+    challenge: 'Choose a cache location and expiration policy for a product catalog that changes several times per hour.',
+    question: 'What should you define before adding a cache?',
+    options: [{ id: 'a', label: 'Only the cache provider' }, { id: 'b', label: 'Freshness, invalidation, and failure behavior' }, { id: 'c', label: 'The maximum number of application servers' }],
+    answer: 'b',
+    takeaway: 'Treat caching as a consistency decision, not a generic performance switch.',
+  },
+  {
+    id: 'system-design-queues',
+    topic: 'System Design',
+    title: 'Move slow work off the request path',
+    summary: 'Use queues to make user-facing requests fast and resilient.',
+    duration: 10,
+    difficulty: 3,
+    concept: 'A queue decouples accepting work from processing it, but introduces retries and eventual consistency.',
+    explanation: [
+      'Good queue candidates are slow tasks that do not need to finish before responding, such as email delivery, media processing, and analytics.',
+      'Workers must be idempotent because messages can be delivered more than once. Track a stable operation ID and make repeated processing safe.',
+    ],
+    code: `await jobs.publish({\n  id: requestId,\n  type: 'invoice.generate',\n  accountId,\n});\n\nreturn response.json({ status: 'accepted' }, { status: 202 });`,
+    language: 'TypeScript',
+    challenge: 'Design an idempotency check for a worker that charges a saved payment method.',
+    question: 'Why should queue workers be idempotent?',
+    options: [{ id: 'a', label: 'Queues may deliver the same message more than once' }, { id: 'b', label: 'Workers cannot access databases' }, { id: 'c', label: 'Queues always process messages out of order' }],
+    answer: 'a',
+    takeaway: 'Async work improves responsiveness only when duplicate delivery and failure recovery are designed explicitly.',
+  },
+  {
+    id: 'ai-structured-output',
+    topic: 'AI',
+    title: 'Build reliable structured AI output',
+    summary: 'Turn probabilistic model responses into validated application data.',
+    duration: 8,
+    difficulty: 2,
+    concept: 'Model output is untrusted input, even when the prompt requests a specific JSON shape.',
+    explanation: [
+      'Use a schema to describe the expected output and validate every response at runtime. Reject malformed data rather than casting it into the desired type.',
+      'Give the model clear field semantics and constraints, then surface validation failures for retry or repair with a bounded attempt count.',
+    ],
+    code: `const LessonSchema = z.object({\n  title: z.string().min(5),\n  summary: z.string(),\n  difficulty: z.number().int().min(1).max(3),\n});\n\nconst lesson = LessonSchema.parse(modelOutput);`,
+    language: 'TypeScript',
+    challenge: 'Extend the schema with a quiz containing exactly three options and one valid answer ID.',
+    question: 'How should an application treat model-generated JSON?',
+    options: [{ id: 'a', label: 'As trusted data because the prompt specified JSON' }, { id: 'b', label: 'As untrusted input that requires runtime validation' }, { id: 'c', label: 'As valid whenever JSON.parse succeeds' }],
+    answer: 'b',
+    takeaway: 'Prompts express intent; schemas enforce contracts.',
+  },
+  {
+    id: 'ai-retrieval',
+    topic: 'AI',
+    title: 'Ground answers with retrieval',
+    summary: 'Use relevant source material to improve accuracy and traceability.',
+    duration: 10,
+    difficulty: 3,
+    concept: 'Retrieval-augmented generation supplies selected source context at request time instead of relying only on model memory.',
+    explanation: [
+      'Split source material into meaningful chunks, embed them, and retrieve a small set relevant to the current question. More context is not automatically better context.',
+      'Preserve source identifiers through retrieval so the answer can cite evidence. Evaluate retrieval quality separately from answer quality.',
+    ],
+    code: `const matches = await vectorStore.search({\n  query: await embed(question),\n  limit: 5,\n  filters: { workspaceId },\n});\n\nconst answer = await generate({ question, context: matches });`,
+    language: 'TypeScript',
+    challenge: 'Define a retrieval evaluation set with expected documents for ten representative user questions.',
+    question: 'What should be evaluated separately in a retrieval system?',
+    options: [{ id: 'a', label: 'Retrieval relevance and answer quality' }, { id: 'b', label: 'Only the final answer length' }, { id: 'c', label: 'Only embedding generation speed' }],
+    answer: 'a',
+    takeaway: 'Reliable grounded answers begin with measurable retrieval quality and traceable sources.',
   },
 ];
 

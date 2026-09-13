@@ -113,11 +113,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .topic-filter { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 18px; }
 .topic-filter span { padding: 4px 7px; color: var(--muted); background: #eaedf3; border-radius: 5px; font: 400 .56rem 'DM Mono', monospace; }
 .lesson-list { display: grid; gap: 7px; }
-.lesson-list button { padding: 12px 13px; text-align: left; border: 1px solid transparent; border-radius: 10px; background: transparent; cursor: pointer; }
+.lesson-list button { position: relative; padding: 12px 48px 12px 13px; text-align: left; border: 1px solid transparent; border-radius: 10px; background: transparent; cursor: pointer; }
 .lesson-list button:hover { background: #fff; }
 .lesson-list button.is-active { background: #fff; border-color: #d9d3fa; box-shadow: 0 8px 22px rgba(31,39,62,.06); }
 .lesson-list span { display: block; margin-bottom: 5px; color: var(--muted); font: 400 .58rem 'DM Mono', monospace; }
 .lesson-list strong { font-size: .76rem; }
+.lesson-list button > i { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); padding: 4px 6px; color: #087756; background: #dff8ef; border-radius: 6px; font: normal 500 .52rem 'DM Mono', monospace; text-transform: uppercase; }
+.lesson-list button.is-complete:not(.is-active) { border-color: #d8eee6; }
 .lesson-content { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: var(--shadow); }
 .lesson-hero { padding: 42px 46px; background: linear-gradient(140deg, #fff, #f3f0ff); border-bottom: 1px solid var(--line); }
 .lesson-hero h1 { margin: 17px 0 8px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -.055em; }

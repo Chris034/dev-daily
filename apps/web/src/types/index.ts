@@ -1,4 +1,4 @@
-export type Topic = 'JavaScript' | 'TypeScript' | 'React' | 'Node.js' | 'CSS';
+export type Topic = 'JavaScript' | 'TypeScript' | 'React' | 'Node.js' | 'CSS' | 'System Design' | 'AI';
 export type Difficulty = 1 | 2 | 3;
 
 export type QuizOption = {

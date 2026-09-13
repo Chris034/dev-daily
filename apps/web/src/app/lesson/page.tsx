@@ -33,8 +33,15 @@ const LessonPage: React.FC = () => {
         <div className="topic-filter">{TOPICS.map((topic) => <span key={topic}>{topic}</span>)}</div>
         <div className="lesson-list">
           {LESSONS.map((item) => (
-            <button type="button" className={item.id === lesson.id ? 'is-active' : ''} onClick={() => chooseLesson(item.id)} key={item.id}>
-              <span>{item.topic} / {item.duration} min</span><strong>{item.title}</strong>
+            <button
+              type="button"
+              className={`${item.id === lesson.id ? 'is-active' : ''} ${state.completions.some((completion) => completion.lessonId === item.id) ? 'is-complete' : ''}`}
+              onClick={() => chooseLesson(item.id)}
+              key={item.id}
+            >
+              <span>{item.topic} / {item.duration} min</span>
+              <strong>{item.title}</strong>
+              {state.completions.some((completion) => completion.lessonId === item.id) && <i aria-label="Completed">Done</i>}
             </button>
           ))}
         </div>

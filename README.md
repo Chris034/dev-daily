@@ -1,11 +1,11 @@
 # Dev Daily
 
-Dev Daily is a focused micro-learning app for developers. It turns practical JavaScript, TypeScript, React, Node.js, and CSS concepts into lessons that take less than ten minutes.
+Dev Daily is a focused micro-learning app for developers. It turns practical programming, system design, and AI engineering concepts into lessons that take about ten minutes.
 
 ## What works
 
 - Personalized recommendations based on selected focus topics
-- Six complete lessons with concepts, examples, challenges, and quizzes
+- Ten complete lessons with concepts, examples, challenges, and quizzes
 - Adaptive learning preferences and configurable daily goals
 - Persistent lesson history, quiz accuracy, streaks, and topic progress
 - Responsive dashboard, lesson reader, library, and settings experience
