@@ -1,20 +1,19 @@
 {
-  "pipeline": {
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["apps/web/dist/**", "apps/api/dist/**"]
-    },
-    "lint": {
-      "outputs": []
-    },
-    "test": {
-      "dependsOn": ["^test"],
-      "outputs": []
+      "outputs": ["dist/**"]
     },
     "dev": {
-      "dependsOn": ["build"],
-      "outputs": []
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
     }
-  },
-  "globalDependencies": ["apps/web", "apps/api"]
+  }
 }

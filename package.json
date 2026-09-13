@@ -1,6 +1,7 @@
 {
   "name": "dev-daily",
   "private": true,
+  "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -9,9 +10,9 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "turbo": "^1.0.0"
+    "turbo": "^2.5.0"
   }
 }

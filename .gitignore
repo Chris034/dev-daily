@@ -6,6 +6,10 @@ apps/api/node_modules/
 # Build output
 apps/web/dist/
 apps/api/dist/
+packages/types/dist/
+.turbo/
+**/.turbo/
+*.tsbuildinfo
 
 # Logs
 npm-debug.log*

@@ -4,7 +4,7 @@
     "jsx": "react-jsx",
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -16,6 +16,7 @@
       "@/*": ["*"]
     }
   },
-  "include": ["src"],
+  "files": ["src/main.tsx", "vite.config.ts"],
+  "include": [],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
 }

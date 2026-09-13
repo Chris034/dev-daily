@@ -1,45 +1,47 @@
-export type Topic = 'JavaScript' | 'TypeScript' | 'React' | 'Node.js' | 'CSS' | 'HTML';
+export type Topic = 'JavaScript' | 'TypeScript' | 'React' | 'Node.js' | 'CSS';
+export type Difficulty = 1 | 2 | 3;
 
-export interface Lesson {
+export type QuizOption = {
+  id: string;
+  label: string;
+};
+
+export type Lesson = {
   id: string;
   topic: Topic;
-  type: 'lesson' | 'challenge' | 'quiz';
-  content: any; // JSON structure for lesson content
-  difficulty: 1 | 2 | 3;
-  createdAt: Date;
-}
+  title: string;
+  summary: string;
+  duration: number;
+  difficulty: Difficulty;
+  concept: string;
+  explanation: string[];
+  code: string;
+  language: string;
+  challenge: string;
+  question: string;
+  options: QuizOption[];
+  answer: string;
+  takeaway: string;
+};
 
-export interface Session {
-  id: string;
-  userId: string | null; // null for guest users
-  guestId: string | null; // null for authenticated users
+export type Completion = {
   lessonId: string;
-  parentLessonId?: string; // optional for "go deeper" functionality
   topic: Topic;
-  type: 'lesson' | 'challenge' | 'quiz';
-  difficulty: 1 | 2 | 3;
-  difficultySource: 'auto' | 'manual';
-  status: 'started' | 'completed' | 'skipped';
-  userAnswer?: string; // optional for user responses
-  feedback?: string; // optional for feedback
-  completedAt?: Date; // optional for completion timestamp
-  createdAt: Date;
-}
+  correct: boolean;
+  completedAt: string;
+};
 
-export interface SkillProfile {
-  userId: string | null; // or guestId
-  topic: Topic;
-  level: 1 | 2 | 3;
-  completedCount: number;
-  correctCount: number;
-  updatedAt: Date;
-}
+export type Preferences = {
+  name: string;
+  dailyGoal: number;
+  difficulty: 'adaptive' | Difficulty;
+  focusTopics: Topic[];
+};
 
-export interface Streak {
-  userId: string | null; // nullable for guest users
-  guestId: string | null; // nullable for authenticated users
+export type LearningState = {
+  completions: Completion[];
   currentStreak: number;
   longestStreak: number;
-  lastActivityDate: Date;
-  totalCompleted: number;
-}
+  lastActivityDate: string | null;
+  preferences: Preferences;
+};

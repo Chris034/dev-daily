@@ -1,68 +1,48 @@
 # Dev Daily
 
-Dev Daily is a daily micro-learning tool designed for developers, delivering personalized, AI-generated lessons, challenges, and quizzes in under 10 minutes. The platform aims to build consistent coding skills through habit-sized sessions that adapt to each user's level and deepen on demand.
+Dev Daily is a focused micro-learning app for developers. It turns practical JavaScript, TypeScript, React, Node.js, and CSS concepts into lessons that take less than ten minutes.
 
-## Features
+## What works
 
-- **Personalized Learning**: Tailored lessons based on user preferences and skill levels.
-- **Daily Challenges**: Engage with coding challenges to reinforce learning.
-- **Progress Tracking**: Monitor your learning streak and progress over time.
-- **Adaptive Difficulty**: Lessons adjust in complexity based on user performance.
-- **Go Deeper**: Explore advanced topics after completing initial lessons.
+- Personalized recommendations based on selected focus topics
+- Six complete lessons with concepts, examples, challenges, and quizzes
+- Adaptive learning preferences and configurable daily goals
+- Persistent lesson history, quiz accuracy, streaks, and topic progress
+- Responsive dashboard, lesson reader, library, and settings experience
+- Local-first guest usage with no account or service dependency
+- Optional Hono API for lesson discovery and recommendation
 
-## Tech Stack
+## Run locally
 
-### Frontend
-- **React**: A JavaScript library for building user interfaces.
-- **TypeScript**: A typed superset of JavaScript for better tooling and type safety.
-- **Vite**: A fast build tool for modern web projects.
-- **Tailwind CSS**: A utility-first CSS framework for styling.
-- **Zustand**: A lightweight state management solution.
-- **CodeMirror**: A versatile text editor for code editing.
+Requirements: Node.js 20 or newer and npm 10 or newer.
 
-### Backend
-- **Node.js**: JavaScript runtime for building server-side applications.
-- **Hono**: A fast, edge-compatible web framework.
-- **PostgreSQL**: A powerful, open-source relational database.
-- **Redis**: An in-memory data structure store for caching.
+```bash
+npm install
+npm run dev
+```
 
-### Authentication
-- **Clerk**: A user management solution for handling authentication and session management.
+The web app runs at `http://localhost:3000` and the API at `http://localhost:8787`.
 
-### AI Integration
-- **Anthropic SDK**: Utilized for generating lessons and challenges.
+To run only one workspace:
 
-## Getting Started
+```bash
+npm run dev --workspace=apps/web
+npm run dev --workspace=apps/api
+```
 
-1. **Clone the Repository**:
-   ```
-   git clone <repository-url>
-   cd dev-daily
-   ```
+## Quality checks
 
-2. **Install Dependencies**:
-   ```
-   npm install
-   ```
+```bash
+npm run typecheck
+npm run build
+```
 
-3. **Run the Development Server**:
-   - For the frontend:
-     ```
-     cd apps/web
-     npm run dev
-     ```
-   - For the backend:
-     ```
-     cd apps/api
-     npm run dev
-     ```
+Production web assets are written to `apps/web/dist`; compiled API files are written to `apps/api/dist`.
 
-4. **Open in Browser**: Visit `http://localhost:3000` to access the application.
+## Architecture
 
-## Contributing
+- `apps/web`: React, TypeScript, React Router, Vite
+- `apps/api`: Hono and Zod on Node.js
+- `packages/types`: shared domain types reserved for server-backed expansion
 
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+Learning progress is stored under the browser key `dev-daily-state-v1`. This makes the product fully usable without infrastructure while leaving the API boundary available for a future authenticated sync service and AI-backed lesson generation.

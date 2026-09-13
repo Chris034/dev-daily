@@ -1,192 +1,78 @@
 import React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-
-type QuestCategory = 'Food' | 'Travel' | 'Seasonal' | 'Romantic';
-
-type Quest = {
-  id: string;
-  category: QuestCategory;
-  title: string;
-  detail: string;
-};
-
-const STORAGE_KEY = 'adventure_mvp_state_v1';
-
-const QUESTS: Quest[] = [
-  { id: 'q1', category: 'Food', title: 'Sunrise Coffee Hunt', detail: 'Find a local cafe before 9 AM and try the house specialty.' },
-  { id: 'q2', category: 'Food', title: 'Street Bite Passport', detail: 'Taste one new street food and rate it in your notes.' },
-  { id: 'q3', category: 'Travel', title: 'Hidden Viewpoint', detail: 'Walk to a viewpoint that is not in your usual route.' },
-  { id: 'q4', category: 'Travel', title: 'Two-Mile Drift', detail: 'Take a map-free stroll and capture one unexpected moment.' },
-  { id: 'q5', category: 'Seasonal', title: 'Weather Window', detail: 'Do one activity that matches today\'s season.' },
-  { id: 'q6', category: 'Seasonal', title: 'Golden Hour Checkpoint', detail: 'Step outside at golden hour and take one photo.' },
-  { id: 'q7', category: 'Romantic', title: 'Sunset Promise', detail: 'Plan a calm sunset stop with a person you care about.' },
-  { id: 'q8', category: 'Romantic', title: 'Quiet Dinner Route', detail: 'Choose a cozy meal spot and leave a short memory note.' },
-];
-
-const CATEGORIES: QuestCategory[] = ['Food', 'Travel', 'Seasonal', 'Romantic'];
-
-const BADGES = [
-  { id: 'b1', title: 'First Step', requirement: 1 },
-  { id: 'b2', title: 'Trail Runner', requirement: 3 },
-  { id: 'b3', title: 'Pathfinder', requirement: 6 },
-];
-
-type StoredState = {
-  selectedCategory: QuestCategory;
-  completedQuestIds: string[];
-  uploadedPhotoDataUrl: string | null;
-};
-
-const getInitialState = (): StoredState => {
-  const fallback: StoredState = {
-    selectedCategory: 'Travel',
-    completedQuestIds: [],
-    uploadedPhotoDataUrl: null,
-  };
-
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return fallback;
-
-    const parsed = JSON.parse(raw) as StoredState;
-
-    if (!parsed.selectedCategory || !Array.isArray(parsed.completedQuestIds)) {
-      return fallback;
-    }
-
-    return parsed;
-  } catch {
-    return fallback;
-  }
-};
+import { Link } from 'react-router-dom';
+import { LESSONS } from '../../data/lessons';
+import { useLearning } from '../../state/LearningContext';
 
 const Dashboard: React.FC = () => {
-  const initial = getInitialState();
-  const [selectedCategory, setSelectedCategory] = useState<QuestCategory>(initial.selectedCategory);
-  const [completedQuestIds, setCompletedQuestIds] = useState<string[]>(initial.completedQuestIds);
-  const [uploadedPhotoDataUrl, setUploadedPhotoDataUrl] = useState<string | null>(initial.uploadedPhotoDataUrl);
-
-  useEffect(() => {
-    const nextState: StoredState = {
-      selectedCategory,
-      completedQuestIds,
-      uploadedPhotoDataUrl,
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextState));
-  }, [selectedCategory, completedQuestIds, uploadedPhotoDataUrl]);
-
-  const filteredQuests = useMemo(
-    () => QUESTS.filter((quest) => quest.category === selectedCategory),
-    [selectedCategory]
-  );
-
-  const totalCount = QUESTS.length;
-  const completedCount = completedQuestIds.length;
-  const progressPercent = Math.round((completedCount / totalCount) * 100);
-
-  const toggleQuest = (questId: string) => {
-    setCompletedQuestIds((previous) =>
-      previous.includes(questId) ? previous.filter((id) => id !== questId) : [...previous, questId]
-    );
-  };
-
-  const handleUpload: React.ChangeEventHandler<HTMLInputElement> = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const value = typeof reader.result === 'string' ? reader.result : null;
-      setUploadedPhotoDataUrl(value);
-    };
-    reader.readAsDataURL(file);
-  };
+  const { state, completedToday } = useLearning();
+  const completedIds = new Set(state.completions.map((item) => item.lessonId));
+  const recommended = LESSONS.find(
+    (lesson) => state.preferences.focusTopics.includes(lesson.topic) && !completedIds.has(lesson.id),
+  ) ?? LESSONS.find((lesson) => !completedIds.has(lesson.id)) ?? LESSONS[0]!;
+  const goalPercent = Math.min(100, (completedToday / state.preferences.dailyGoal) * 100);
+  const accuracy = state.completions.length
+    ? Math.round((state.completions.filter((item) => item.correct).length / state.completions.length) * 100)
+    : 0;
 
   return (
-    <section className="adventure-page">
-      <article className="hero-card">
-        <p className="hero-eyebrow">Adventure Planner</p>
-        <h2 className="hero-title">Build your next meaningful day</h2>
-        <p className="hero-copy">Choose a quest, complete it, and keep your progress alive across sessions.</p>
-        <div className="hero-progress-row">
-          <span>{completedCount} of {totalCount} quests complete</span>
-          <span>{progressPercent}%</span>
+    <div className="page-stack">
+      <header className="page-heading">
+        <div>
+          <p className="eyebrow">Your learning dashboard</p>
+          <h1>Good to see you, {state.preferences.name}.</h1>
+          <p>One focused concept today compounds into better code tomorrow.</p>
         </div>
-        <div className="hero-progress-track" role="presentation">
-          <div className="hero-progress-fill" style={{ width: `${progressPercent}%` }} />
-        </div>
-      </article>
+        <Link to={`/lesson?id=${recommended.id}`} className="button button-primary">Start today&apos;s lesson <span>-&gt;</span></Link>
+      </header>
 
-      <article className="card-block">
-        <div className="card-heading-row">
-          <h3>Adventure Memory</h3>
-          <label className="upload-button" htmlFor="photo-upload">Upload Photo</label>
-          <input id="photo-upload" type="file" accept="image/*" onChange={handleUpload} className="hidden-upload" />
-        </div>
-        {uploadedPhotoDataUrl ? (
-          <img src={uploadedPhotoDataUrl} alt="Uploaded adventure memory" className="photo-preview" />
-        ) : (
-          <div className="photo-placeholder">Add a real photo from your device to personalize your quests.</div>
-        )}
-      </article>
+      <section className="stat-grid" aria-label="Learning statistics">
+        <article className="stat-card"><span>Current streak</span><strong>{state.currentStreak}</strong><small>days in a row</small></article>
+        <article className="stat-card"><span>Lessons finished</span><strong>{state.completions.length}</strong><small>all time</small></article>
+        <article className="stat-card"><span>Quiz accuracy</span><strong>{accuracy}%</strong><small>completed lessons</small></article>
+        <article className="stat-card"><span>Personal best</span><strong>{state.longestStreak}</strong><small>day streak</small></article>
+      </section>
 
-      <article className="card-block">
-        <h3>Quest Categories</h3>
-        <div className="pill-row">
-          {CATEGORIES.map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => setSelectedCategory(category)}
-              className={`category-pill ${selectedCategory === category ? 'is-active' : ''}`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </article>
+      <div className="dashboard-grid">
+        <section className="panel featured-lesson">
+          <div className="section-heading"><div><p className="eyebrow">Recommended next</p><h2>{recommended.title}</h2></div><span className="topic-badge">{recommended.topic}</span></div>
+          <p className="featured-summary">{recommended.summary}</p>
+          <div className="lesson-meta"><span>{recommended.duration} min</span><span>Level {recommended.difficulty}</span><span>Lesson + quiz</span></div>
+          <div className="code-window" aria-hidden="true"><div className="window-dots"><i /><i /><i /></div><pre>{recommended.code}</pre></div>
+          <Link to={`/lesson?id=${recommended.id}`} className="button button-primary button-wide">Continue learning <span>-&gt;</span></Link>
+        </section>
 
-      <article className="card-block">
-        <h3>{selectedCategory} Quests</h3>
-        <div className="quest-list">
-          {filteredQuests.map((quest) => {
-            const isCompleted = completedQuestIds.includes(quest.id);
+        <aside className="side-stack">
+          <section className="panel daily-goal">
+            <div className="section-heading"><div><p className="eyebrow">Daily goal</p><h2>{completedToday} of {state.preferences.dailyGoal} lessons</h2></div><strong>{Math.round(goalPercent)}%</strong></div>
+            <div className="progress-track"><span style={{ width: `${goalPercent}%` }} /></div>
+            <p>{completedToday >= state.preferences.dailyGoal ? 'Goal complete. Nice work.' : 'A few focused minutes is all it takes.'}</p>
+          </section>
+          <section className="panel topic-progress">
+            <div className="section-heading"><div><p className="eyebrow">Skill map</p><h2>Topics in motion</h2></div><Link to="/settings">Edit</Link></div>
+            {state.preferences.focusTopics.map((topic) => {
+              const count = state.completions.filter((item) => item.topic === topic).length;
+              return <div className="topic-row" key={topic}><span>{topic}</span><div className="mini-track"><i style={{ width: `${Math.min(100, count * 34)}%` }} /></div><strong>{count}</strong></div>;
+            })}
+          </section>
+        </aside>
+      </div>
 
+      <section className="panel">
+        <div className="section-heading"><div><p className="eyebrow">Lesson library</p><h2>Keep exploring</h2></div><Link to="/lesson">View all</Link></div>
+        <div className="library-grid">
+          {LESSONS.slice(0, 3).map((lesson) => {
+            const done = completedIds.has(lesson.id);
             return (
-              <div key={quest.id} className="quest-card">
-                <div>
-                  <h4>{quest.title}</h4>
-                  <p>{quest.detail}</p>
-                </div>
-                <button
-                  type="button"
-                  className={`quest-toggle ${isCompleted ? 'is-complete' : ''}`}
-                  onClick={() => toggleQuest(quest.id)}
-                >
-                  {isCompleted ? 'Completed' : 'Mark Complete'}
-                </button>
-              </div>
+              <Link to={`/lesson?id=${lesson.id}`} className="library-card" key={lesson.id}>
+                <div><span className="topic-badge">{lesson.topic}</span>{done && <span className="complete-badge">Complete</span>}</div>
+                <h3>{lesson.title}</h3><p>{lesson.summary}</p>
+                <span className="text-link">{lesson.duration} min lesson <b>-&gt;</b></span>
+              </Link>
             );
           })}
         </div>
-      </article>
-
-      <article className="card-block">
-        <h3>Achievement Badges</h3>
-        <div className="badge-row">
-          {BADGES.map((badge) => {
-            const unlocked = completedCount >= badge.requirement;
-
-            return (
-              <div key={badge.id} className={`badge-chip ${unlocked ? 'is-unlocked' : ''}`}>
-                <span className="badge-title">{badge.title}</span>
-                <span className="badge-rule">Complete {badge.requirement} quests</span>
-              </div>
-            );
-          })}
-        </div>
-      </article>
-    </section>
+      </section>
+    </div>
   );
 };
 
